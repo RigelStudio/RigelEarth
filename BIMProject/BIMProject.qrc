@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="/">
+    <file>Resources/mainWindow/banner.png</file>
+    <file>Resources/mainWindow/exit_0.png</file>
+    <file>Resources/mainWindow/exit_1.png</file>
+    <file>Resources/mainWindow/hf.png</file>
+    <file>Resources/mainWindow/tab_1.png</file>
+  </qresource>
+</RCC>
