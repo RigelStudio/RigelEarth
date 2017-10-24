@@ -28,7 +28,7 @@
 #pragma comment(lib,"osgWidget.lib")
 
 #pragma comment(lib,"MeQt.lib")
-#pragma comment(lib,"MeDBd.lib")
+#pragma comment(lib,"MeDB.lib")
 #pragma comment(lib,"MeCore.lib")
 
 #endif

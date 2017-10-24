@@ -1,33 +1,47 @@
-cmake_minimum_required(VERSION 3.4)
-project(BIMProject)
+#添加CMakeList头信息，cmake最低版本
+cmake_minimum_required(VERSION 2.8)
 
-#设置开发需要的库
-SET(OSG_DIR "" CACHE PATH "osg directory")
-SET(OSGEARTH_DIR "" CACHE PATH "osgEarth directory")
-SET(MEEARTH_DIR "" CACHE PATH "MeEarth directory")
+#设置当前CMakeList.txt所在文件为当前目录
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# 设置解决方案名称
+project(MeEarth)
+
+#设置开发需要的第三方库
+SET(OSG_DIR "" CACHE PATH "osg and osgEarth directory")
+SET(MEGISENGINE_DIR "" CACHE PATH "MeEarth directory")
+
+# 如果不配置第三方库，则不进行之后的生成
+if(NOT OSG_DIR)
+	message(FATAL_ERROR "请选择osg和osgEarth的目录!")
+endif()
+
+if(NOT MEGISENGINE_DIR)
+	message(FATAL_ERROR "请选择MeGISEngine的目录!")
+endif()
+
+# 设置第三方头文件与链接库的路径
+include_directories(
+	${OSG_DIR}/include
+	${CMAKE_BINARY_DIR}
+	${MEGISENGINE_DIR}/src
+)
+
+link_directories(
+	${OSG_DIR}/lib
+	${OUTPUT_LIBDIR}
+)
+
+#设置cmake其他模块功能的路径
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules/")
-include(niubiMacroUtils)
+#设置要使用的cmake模块
+#include()
 
-FIND_PACKAGE(opengl)
-FIND_PACKAGE(openThreads)
-FIND_PACKAGE(osg)
-FIND_PACKAGE(osgDB)
-FIND_PACKAGE(osgUtil)
-FIND_PACKAGE(osgGA)
-FIND_PACKAGE(osgViewer)
-FIND_PACKAGE(osgText)
-FIND_PACKAGE(osgAnimation)
-FIND_PACKAGE(osgShadow)
-FIND_PACKAGE(osgTerrain)
 
-# FIND_PACKAGE(fbx)
-
-FIND_PACKAGE(osgEarth)
-
-FIND_PACKAGE(MeEarth)
-if(MEEARTH_FOUND)
-    include_directories(${MEEARTH_INCLUDE_DIR})
+#查找MeGISEngine开发包
+FIND_PACKAGE(MeGISEngine)
+if(MEGISENGINE_FOUND)
+    include_directories(${MEGISENGINE_INCLUDE_DIR})
 endif(MEEARTH_FOUND)
 
 
@@ -35,58 +49,30 @@ OPTION(BUILD_STATIC_LIBRAY  "建造静态库" ON)
 OPTION(BUILD_WINDOWS_SYSTEM "建造窗口程序" OFF)
 
 
-SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+# 设置输出路径，不区分不32、64
+set(OUTPUT_BINDIR ${CMAKE_SOURCE_DIR}/bin)
 
+# 设置lib库的输出路径，不区分32、64
+set(OUTPUT_LIBDIR ${CMAKE_SOURCE_DIR}/lib)
 
-# Tell CMake to run moc when necessary:
-set(CMAKE_AUTOMOC ON)
-# As moc files are generated in the binary dir, tell CMake
-# to always look for includes there:
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# 对每一个平台，设置其输出路径
+foreach(CONF ${CMAKE_CONFIGURATION_TYPES})
+	string(TOUPPER "${CONF}" CONF_UC)
+	set("CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CONF_UC}" ${OUTPUT_LIBDIR})
+	set("CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONF_UC}" ${OUTPUT_BINDIR})
+	set("CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CONF_UC}" "${OUTPUT_BINDIR}${SEPARATE_FOLDER}")
+endforeach()
 
-# Widgets finds its own dependencies (QtGui and QtCore).
-# find_package(Qt5Widgets REQUIRED)
-find_package(Qt5 COMPONENTS
-    Widgets
-    OpenGL
-    Multimedia
-    # Declarative
-    LinguistTools #for ts
-    )
+# Debug库输出带d,Release不带
+set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")
+set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
+if(CMAKE_BUILD_TYPE MATCHES "Release")
+	SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELEASE_POSTFIX}")
+elseif(CMAKE_BUILD_TYPE MATCHES "Debug")
+	SET(CMAKE_BUILD_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
+else()
+	SET(CMAKE_BUILD_POSTFIX "")
+endif()
 
-# The Qt5Widgets_INCLUDES also includes the include directories for
-# dependencies QtCore and QtGui
-include_directories(
-    ${Qt5Widgets_INCLUDE_DIRS}
-    ${Qt5Multimedia_INCLUDE_DIRS}
-    )
-
-# We need add -DQT_WIDGETS_LIB when using QtWidgets in Qt 5.
-add_definitions(
-    ${Qt5Widgets_DEFINITIONS}
-    ${Qt5Multimedia_DEFINITIONS}
-    )
-
-# message( WARNING "aa" ${Qt5Multimedia_INCLUDE_DIRS} )
-
-# Executables fail to build with Qt 5 in the default configuration
-# without -fPIE. We add that here.
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-
-# set postfix
-SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")
-SET(CMAKE_RELEASE_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
-SET(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "add a postfix, usually empty on windows")
-SET(CMAKE_MINSIZEREL_POSTFIX "s" CACHE STRING "add a postfix, usually empty on windows")
-
-include_directories( ${CMAKE_SOURCE_DIR}/include )
-include_directories( ${OSG_INCLUDE_DIR} )
-# include_directories( ${FBX_INCLUDE_DIR} )
-
-LINK_DIRECTORIES( ${OSG_DIR}/lib )
-LINK_DIRECTORIES( ${MEEARTH_DIR}/lib )
-
-set(CMAKE_AUTOMOC OFF)
-
-
-add_subdirectory(BIMProject)
+#添加子目录
+add_subdirectory(src)

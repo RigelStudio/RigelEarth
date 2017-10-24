@@ -7,7 +7,6 @@
 #include "TopMenu.h"
 #include "LeftPanel.h"
 
-
 class BIMProject : public QMainWindow
 {
 	Q_OBJECT
