@@ -5,31 +5,32 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # 设置解决方案名称
-project(MeEarth)
+project(RIGELEarth)
 
 #设置开发需要的第三方库
 SET(OSG_DIR "" CACHE PATH "osg and osgEarth directory")
-SET(MEGISENGINE_DIR "" CACHE PATH "MeEarth directory")
+SET(RIGELGIS_DIR "" CACHE PATH "RigelGIS directory")
 
 # 如果不配置第三方库，则不进行之后的生成
 if(NOT OSG_DIR)
 	message(FATAL_ERROR "请选择osg和osgEarth的目录!")
 endif()
 
-if(NOT MEGISENGINE_DIR)
-	message(FATAL_ERROR "请选择MeGISEngine的目录!")
+if(NOT RIGELGIS_DIR)
+	message(FATAL_ERROR "请选择RigelGIS的目录!")
 endif()
 
 # 设置第三方头文件与链接库的路径
 include_directories(
 	${OSG_DIR}/include
 	${CMAKE_BINARY_DIR}
-	${MEGISENGINE_DIR}/src
+	${RIGELGIS_DIR}/src
 )
 
 link_directories(
 	${OSG_DIR}/lib
 	${OUTPUT_LIBDIR}
+	${RIGELGIS_DIR}/lib
 )
 
 #设置cmake其他模块功能的路径
@@ -38,11 +39,11 @@ SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules/")
 #include()
 
 
-#查找MeGISEngine开发包
-FIND_PACKAGE(MeGISEngine)
-if(MEGISENGINE_FOUND)
-    include_directories(${MEGISENGINE_INCLUDE_DIR})
-endif(MEEARTH_FOUND)
+#RIGELGIS_DIR
+FIND_PACKAGE(RIGELGIS)
+if(RIGELGIS_FOUND)
+    include_directories(${RIGELGIS_INCLUDE_DIR})
+endif(RIGELGIS_FOUND)
 
 
 OPTION(BUILD_STATIC_LIBRAY  "建造静态库" ON)

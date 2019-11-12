@@ -11,9 +11,9 @@
 #pragma comment(lib,"osgEarthUtild.lib")
 #pragma comment(lib,"osgWidgetd.lib")
 
-#pragma comment(lib,"MeQtd.lib")
-#pragma comment(lib,"MeDBd.lib")
-#pragma comment(lib,"MeCored.lib")
+// #pragma comment(lib,"MeQtd.lib")
+// #pragma comment(lib,"MeDBd.lib")
+// #pragma comment(lib,"MeCored.lib")
 
 #
 
